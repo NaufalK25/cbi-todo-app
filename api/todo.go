@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"cbi-todo-app/store"
+	"cbi-todo-app/api/lib/store"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
