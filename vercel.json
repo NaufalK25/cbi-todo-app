@@ -7,7 +7,12 @@
     },
     {
       "src": "api/*.go",
-      "use": "@vercel/go"
+      "use": "@vercel/go",
+      "config": {
+        "env": {
+          "GO_BUILD_FLAGS": "-ldflags '-s -w'"
+        }
+      }
     }
   ],
   "routes": [
