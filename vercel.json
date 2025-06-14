@@ -6,13 +6,8 @@
       "use": "@vercel/next"
     },
     {
-      "src": "api/**/*.go",
-      "use": "@vercel/go",
-      "config": {
-        "env": {
-          "GO_BUILD_FLAGS": "-ldflags '-s -w'"
-        }
-      }
+      "src": "api/*.go",
+      "use": "@vercel/go"
     }
   ],
   "routes": [
