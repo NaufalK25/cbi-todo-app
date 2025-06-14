@@ -1,15 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useFlash } from "../../flash-context";
 
 export default function CreateTodo() {
-  const [title, setTitle] = useState("");
   const router = useRouter();
+  const [title, setTitle] = useState("");
+  const { showFlash } = useFlash();
+
+  useEffect(() => {
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, []);
 
   const handleCreate = async () => {
-    const url =
+    const apiUrl =
       process.env.NODE_ENV === "development"
         ? "http://localhost:3030/api/todos"
         : "/api/todos";
@@ -18,13 +27,21 @@ export default function CreateTodo() {
       return alert("Title can't be empty!");
     }
 
-    await fetch(url, {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, done: false }),
     });
+    const data = await response.json();
 
-    router.push("/");
+    if (data.success) {
+      showFlash("Todo created successfully!", "success");
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } else {
+      showFlash(data.error, "error");
+    }
   };
 
   return (

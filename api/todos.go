@@ -32,35 +32,76 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	if idParam != "" {
 		id, err := strconv.Atoi(idParam)
 		if err != nil || id == 0 {
-			http.Error(w, "Invalid id", http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Invalid id",
+			})
 			return
 		}
 
 		todo, exists := Todos[id]
 		if !exists {
-			http.Error(w, "Todo not found", http.StatusNotFound)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Todo not found",
+			})
 			return
 		}
 
 		switch r.Method {
 		case "GET":
-			json.NewEncoder(w).Encode(todo)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": true,
+				"message": "Todo fetched successfully",
+				"data":    todo,
+			})
+			return
+
 		case "PUT":
 			var updated Todo
 			if err := json.NewDecoder(r.Body).Decode(&updated); err != nil {
-				http.Error(w, "Invalid body", http.StatusBadRequest)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"success": false,
+					"error":   "Invalid body",
+				})
 				return
 			}
 			updated.ID = id
 			Todos[id] = updated
-			json.NewEncoder(w).Encode(updated)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": true,
+				"message": "Todo updated successfully",
+				"data":    updated,
+			})
+			return
+
 		case "DELETE":
 			delete(Todos, id)
-			w.WriteHeader(http.StatusNoContent)
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": true,
+				"message": "Todo deleted successfully",
+				"data":    nil,
+			})
+			return
+
 		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Method not allowed",
+			})
+			return
 		}
-		return
 	}
 
 	switch r.Method {
@@ -69,18 +110,41 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		for _, t := range Todos {
 			todos = append(todos, t)
 		}
-		json.NewEncoder(w).Encode(todos)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": "Todos fetched successfully",
+			"data":    todos,
+		})
+
 	case "POST":
 		var todo Todo
 		if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
-			http.Error(w, "Invalid body", http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success": false,
+				"error":   "Invalid body",
+			})
 			return
 		}
 		todo.ID = NextID
 		NextID++
 		Todos[todo.ID] = todo
-		json.NewEncoder(w).Encode(todo)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": "Todo created successfully",
+			"data":    todo,
+		})
+
 	default:
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "Method not allowed",
+		})
+		return
 	}
 }

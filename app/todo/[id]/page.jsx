@@ -3,12 +3,21 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
+import { useFlash } from "../../flash-context";
 
 export default function TodoDetailPage() {
   const router = useRouter();
   const { id } = useParams();
   const [todo, setTodo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { showFlash } = useFlash();
+
+  useEffect(() => {
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, []);
 
   const apiUrl =
     process.env.NODE_ENV === "development"
@@ -16,26 +25,54 @@ export default function TodoDetailPage() {
       : `/api/todos?id=${id}`;
 
   useEffect(() => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then(setTodo)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const fetchTodo = async () => {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.success) {
+        showFlash(data.message, "success");
+        setTodo(data.data);
+      } else {
+        showFlash(data.error, "error");
+      }
+
+      setLoading(false);
+    };
+
+    fetchTodo();
   }, [apiUrl]);
 
   const updateTodo = async () => {
     if (!todo) return;
-    await fetch(apiUrl, {
+    const response = await fetch(apiUrl, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(todo),
     });
-    router.push("/");
+    const data = await response.json();
+
+    if (data.success) {
+      showFlash(data.message, "success");
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } else {
+      showFlash(data.error, "error");
+    }
   };
 
   const deleteTodo = async () => {
-    await fetch(apiUrl, { method: "DELETE" });
-    router.push("/");
+    const response = await fetch(apiUrl, { method: "DELETE" });
+    const data = await response.json();
+
+    if (data.success) {
+      showFlash(data.message, "success");
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } else {
+      showFlash(data.error, "error");
+    }
   };
 
   if (loading) return <p>Loading...</p>;

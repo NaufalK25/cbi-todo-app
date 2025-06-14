@@ -30,11 +30,15 @@
    ```bash
    cp .env.example .env
    ```
-4. Run the server
+4. Download Go modules
+   ```bash
+   go mod download
+   ```
+5. Run the server
    ```bash
     go run go-dev/main.go
    ```
-5. Run the client
+6. Run the client
    ```
    npm run dev
    ```

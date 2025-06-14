@@ -2,23 +2,52 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useFlash } from "./flash-context";
 
 export default function HomePage() {
+  const router = useRouter();
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showFlash } = useFlash();
 
   useEffect(() => {
-    const url =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3030/api/todos"
-        : "/api/todos";
-
-    fetch(url)
-      .then((res) => res.json())
-      .then(setTodos)
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+    const token = window.localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    }
   }, []);
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      const apiUrl =
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3030/api/todos"
+          : "/api/todos";
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      if (data.success) {
+        showFlash(data.message, "success");
+        setTodos(data.data);
+      } else {
+        showFlash(data.error, "error");
+      }
+
+      setLoading(false);
+    };
+
+    fetchTodos();
+  }, []);
+
+  const handleLogout = () => {
+    window.localStorage.removeItem("token");
+    showFlash("Logout successfully!", "success");
+      setTimeout(() => {
+        router.push("login");
+      }, 1000);
+  };
 
   return (
     <main className="flex flex-col gap-2">
@@ -44,6 +73,12 @@ export default function HomePage() {
           ))}
         </ul>
       )}
+      <button
+        onClick={handleLogout}
+        className="cursor-pointer border py-1 px-2 rounded-md bg-red-700 w-fit"
+      >
+        Logout
+      </button>
     </main>
   );
 }
