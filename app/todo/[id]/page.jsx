@@ -12,8 +12,8 @@ export default function TodoDetailPage() {
 
   const apiUrl =
     process.env.NODE_ENV === "development"
-      ? `http://localhost:3030/api/todo?id=${id}`
-      : `/api/todo?id=${id}`;
+      ? `http://localhost:3030/api/todos?id=${id}`
+      : `/api/todos?id=${id}`;
 
   useEffect(() => {
     fetch(apiUrl)
