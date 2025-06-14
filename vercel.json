@@ -6,7 +6,7 @@
       "use": "@vercel/next"
     },
     {
-      "src": "api/*.go",
+      "src": "api/**/*.go",
       "use": "@vercel/go",
       "config": {
         "env": {

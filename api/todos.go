@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"cbi-todo-app/api/lib/store"
+	"cbi-todo-app/api"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
