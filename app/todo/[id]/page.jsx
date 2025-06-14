@@ -39,7 +39,16 @@ export default function TodoDetailPage() {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (!todo) return <p>Todo not found.</p>;
+  if (!todo) {
+    return (
+      <main className="flex flex-col items-center justify-center gap-4">
+        <p>Todo not found.</p>
+        <Link href="/" className="border py-1 px-2 rounded-md">
+          Back
+        </Link>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-col gap-2">

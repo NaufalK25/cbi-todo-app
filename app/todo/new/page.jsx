@@ -42,7 +42,7 @@ export default function CreateTodo() {
         </Link>
         <button
           onClick={handleCreate}
-          className="border py-1 px-2 rounded-md bg-green-700"
+          className="cursor-pointer border py-1 px-2 rounded-md bg-green-700"
         >
           Create
         </button>
