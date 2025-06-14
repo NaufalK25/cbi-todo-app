@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"./lib/store"
+	"api/lib/store"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

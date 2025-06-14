@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"./lib/store"
+	"api/lib/store"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {

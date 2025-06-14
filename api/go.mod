@@ -1,3 +1,3 @@
-module cbi-todo-app
+module api
 
 go 1.24.3
